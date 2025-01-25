@@ -1,0 +1,33 @@
+name: "Setup Isabelle"
+description: "Downloads and installs Isabelle theorem prover for Linux-based operating systems"
+inputs:
+  isabelle-version: "The Isabelle version"
+  required: true
+  default: 2024
+runs:
+  using: "composite"
+  env: 
+    ISABELLE_VERSION: ${{inputs.isabelle-version}}
+    ISABELLE_PATH: "$RUNNER_TOOL_CACHE/isabelle/${{inputs.isabelle-version}}"
+    TEMP_DIR_PATH: "$RUNNER_TEMP/_isabelle"
+  steps: 
+    - name: Setup cache 
+      id: cache
+      shell: bash
+      uses: action/cache@v4
+      with:
+        path: $ISABELLE_PATH
+        key: "$ISABELLE_VERSION" # only support Intel Linux, so version number is sufficient
+
+    - name: Download and install Isabelle
+      shell: bash
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p $TEMP_DIR_PATH
+        wget --quiet https://isabelle.in.tum.de/website-Isabelle${ISABELLE_VERSION}/dist/Isabelle${ISABELLE_VERSION}_linux.tar.gz -O "$TEMP_DIR_PATH/isabelle.tar.gz"
+        mkdir -p $ISABELLE_PATH
+        tar -xzf "$TEMP_DIR_PATH/isabelle.tar.gz" -C $ISABELLE_PATH --strip-components=1
+        rm $TAR_PATH
+    - name: Add Isabelle to the path
+      shell: bash
+      run: echo $ISABELLE_PATH >> $GITHUB_PATH
