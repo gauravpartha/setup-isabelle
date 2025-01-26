@@ -20,12 +20,11 @@ jobs:
         uses: ./
         with: 
           isabelle-version: ${{matrix.isabelle-version}}
-      - name: Isabelle version
-        run: isabelle version
-      - name: Test expected version
+      - name: Check Isabelle version
         shell: bash
         run: |
-          if [[ "$(isabelle version)" == "${{matrix.isabelle-version}}" ]]; then
+          isabelle version
+          if [[ "$(isabelle version)" == "Isabelle${{matrix.isabelle-version}}" ]]; then
             echo "Success"
             exit 0
           else
