@@ -7,22 +7,28 @@ inputs:
     default: 2024
 runs:
   using: "composite"
-  env: 
-    ISABELLE_VERSION: ${{inputs.isabelle-version}}
-    ISABELLE_PATH: "$RUNNER_TOOL_CACHE/isabelle/${{inputs.isabelle-version}}"
-    TEMP_DIR_PATH: "$RUNNER_TEMP/_isabelle"
   steps: 
-    - name: Setup cache 
+    - name: Set up paths 
+      id: local-envs
+      shell: bash
+      run: |
+        echo "isabelle_path=$RUNNER_TOOL_CACHE/isabelle/${{inputs.isabelle-version}}" >> "$GITHUB_OUTPUT"
+        echo "temp_dir_path=$RUNNER_TEMP/_isabelle" >> "$GITHUB_OUTPUT"
+    - name: Set up cache 
       id: cache
       shell: bash
       uses: action/cache@v4
       with:
         path: $ISABELLE_PATH
-        key: "Linux-$ISABELLE_VERSION" # only support Linux 
+        key: "Linux-${{inputs.isabelle-version}}" # only support Linux 
 
     - name: Download and install Isabelle
       shell: bash
       if: steps.cache.outputs.cache-hit != 'true'
+      env: 
+        ISABELLE_VERSION: ${{inputs.isabelle-version}}
+        ISABELLE_PATH: ${{steps.local-envs.outputs.isabelle_path}}
+        TEMP_DIR_PATH: ${{steps.local-envs.outputs.temp_dir_path}}
       run: |
         mkdir -p $TEMP_DIR_PATH
         wget --quiet https://isabelle.in.tum.de/website-Isabelle${ISABELLE_VERSION}/dist/Isabelle${ISABELLE_VERSION}_linux.tar.gz -O "$TEMP_DIR_PATH/isabelle.tar.gz"
@@ -32,3 +38,5 @@ runs:
     - name: Add Isabelle to the path
       shell: bash
       run: echo $ISABELLE_PATH >> $GITHUB_PATH
+      env: 
+        ISABELLE_PATH: ${{steps.local-envs.outputs.isabelle_path}}
