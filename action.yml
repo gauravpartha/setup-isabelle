@@ -16,7 +16,7 @@ runs:
         echo "temp_dir_path=$RUNNER_TEMP/_isabelle" >> "$GITHUB_OUTPUT"
     - name: Set up cache 
       id: cache
-      uses: action/cache@v4
+      uses: actions/cache@v4
       with:
         path: $ISABELLE_PATH
         key: "Linux-${{inputs.isabelle-version}}" # only support Linux 
