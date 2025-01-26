@@ -17,7 +17,7 @@ runs:
       uses: action/cache@v4
       with:
         path: $ISABELLE_PATH
-        key: "$ISABELLE_VERSION" # only support Intel Linux, so version number is sufficient
+        key: "Linux-$ISABELLE_VERSION" # only support Linux 
 
     - name: Download and install Isabelle
       shell: bash
