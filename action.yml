@@ -35,6 +35,6 @@ runs:
         tar -xzf "$TEMP_DIR_PATH/isabelle.tar.gz" -C $ISABELLE_PATH --strip-components=1
     - name: Add Isabelle to the path
       shell: bash
-      run: echo $ISABELLE_PATH >> $GITHUB_PATH
+      run: echo $ISABELLE_PATH/bin >> $GITHUB_PATH
       env: 
         ISABELLE_PATH: ${{steps.local-envs.outputs.isabelle_path}}
