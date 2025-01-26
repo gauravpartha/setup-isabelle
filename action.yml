@@ -1,33 +1,40 @@
 name: "Setup Isabelle"
 description: "Downloads and installs Isabelle theorem prover for Linux-based operating systems"
 inputs:
-  isabelle-version: "The Isabelle version"
-  required: true
-  default: 2024
+  isabelle-version: 
+    description: "The Isabelle version"
+    required: true
+    default: 2024
 runs:
   using: "composite"
-  env: 
-    ISABELLE_VERSION: ${{inputs.isabelle-version}}
-    ISABELLE_PATH: "$RUNNER_TOOL_CACHE/isabelle/${{inputs.isabelle-version}}"
-    TEMP_DIR_PATH: "$RUNNER_TEMP/_isabelle"
   steps: 
-    - name: Setup cache 
-      id: cache
+    - name: Set up paths 
+      id: local-envs
       shell: bash
-      uses: action/cache@v4
+      run: |
+        echo "isabelle_path=$RUNNER_TOOL_CACHE/isabelle/${{inputs.isabelle-version}}" >> "$GITHUB_OUTPUT"
+        echo "temp_dir_path=$RUNNER_TEMP/_isabelle" >> "$GITHUB_OUTPUT"
+    - name: Set up cache 
+      id: cache
+      uses: actions/cache@v4
       with:
-        path: $ISABELLE_PATH
-        key: "$ISABELLE_VERSION" # only support Intel Linux, so version number is sufficient
+        path: ${{steps.local-envs.outputs.isabelle_path}}
+        key: "Linux-${{inputs.isabelle-version}}" # only support Linux 
 
     - name: Download and install Isabelle
       shell: bash
       if: steps.cache.outputs.cache-hit != 'true'
+      env: 
+        ISABELLE_VERSION: ${{inputs.isabelle-version}}
+        ISABELLE_PATH: ${{steps.local-envs.outputs.isabelle_path}}
+        TEMP_DIR_PATH: ${{steps.local-envs.outputs.temp_dir_path}}
       run: |
         mkdir -p $TEMP_DIR_PATH
         wget --quiet https://isabelle.in.tum.de/website-Isabelle${ISABELLE_VERSION}/dist/Isabelle${ISABELLE_VERSION}_linux.tar.gz -O "$TEMP_DIR_PATH/isabelle.tar.gz"
         mkdir -p $ISABELLE_PATH
         tar -xzf "$TEMP_DIR_PATH/isabelle.tar.gz" -C $ISABELLE_PATH --strip-components=1
-        rm $TAR_PATH
     - name: Add Isabelle to the path
       shell: bash
-      run: echo $ISABELLE_PATH >> $GITHUB_PATH
+      run: echo $ISABELLE_PATH/bin >> $GITHUB_PATH
+      env: 
+        ISABELLE_PATH: ${{steps.local-envs.outputs.isabelle_path}}
