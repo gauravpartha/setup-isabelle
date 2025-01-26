@@ -1,9 +1,10 @@
 name: "Setup Isabelle"
 description: "Downloads and installs Isabelle theorem prover for Linux-based operating systems"
 inputs:
-  isabelle-version: "The Isabelle version"
-  required: true
-  default: 2024
+  isabelle-version: 
+    description: "The Isabelle version"
+    required: true
+    default: 2024
 runs:
   using: "composite"
   env: 
