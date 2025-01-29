@@ -5,4 +5,13 @@ Currently, this action supports only Linux versions of Isabelle, and thus only w
 Caching of the downloaded Isabelle version across workflows is implemented using the [cache action](https://github.com/actions/cache).
 
 This action takes a single parameter `isabelle-version` indicating the version of Isabelle that should be set up.
-See the [CI](https://github.com/gauravpartha/setup-isabelle/blob/main/.github/workflows/ci.yml) for this repository, which showcases how the action can be used.
+The following code shows how the action can be used within another Isabelle action to set up Isabelle 2024:
+```yaml
+- name: Set up Isabelle
+  uses: gauravpartha/setup-isabelle@v1
+  with: 
+    isabelle-version: 2024
+
+- name: Isabelle version
+  run: isabelle version
+```
